@@ -20,7 +20,7 @@ export default function Home() {
       <section className="relative h-[500px] md:h-[600px] w-full">
         <div className="absolute inset-0 bg-black/50 z-10" />
         <Image
-          src="/hero3.jpg"
+          src="/hero pizza.avif"
           alt="Délicieuses pizzas"
           fill
           className="object-cover"

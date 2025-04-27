@@ -136,18 +136,6 @@ export default function RegisterPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="address">Adresse de livraison</Label>
-                  <Input
-                    id="address"
-                    name="address"
-                    placeholder="123 Rue des Palmiers, Libreville"
-                    value={formData.address}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label htmlFor="password">Mot de passe</Label>
                   <Input
                     id="password"
