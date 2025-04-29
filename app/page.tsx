@@ -19,6 +19,7 @@ export default function Home() {
 
       <HeroCarousel />
 
+
       {/* How It Works */}
       <section className="py-16 bg-muted">
         <div className="container">
