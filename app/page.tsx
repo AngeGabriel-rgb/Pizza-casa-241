@@ -7,45 +7,18 @@ import { PizzeriaCard } from "@/components/pizzeria/pizzeria-card"
 import { getPopularPizzas } from "@/data/pizzas"
 import { getNearbyPizzerias } from "@/data/pizzerias"
 import { ArrowRight, MapPin, Pizza, Truck } from "lucide-react"
+import HeroCarousel from "@/components/hero-carousel"
 
 export default function Home() {
-  const popularPizzas = getPopularPizzas().slice(0, 4)
-  const nearbyPizzerias = getNearbyPizzerias().slice(0, 3)
+  const popularPizzas = getPopularPizzas().slice(0, 4);
+  const nearbyPizzerias = getNearbyPizzerias().slice(0, 3);
 
   return (
     <div className="flex flex-col min-h-screen">
       <MainNav />
 
-      {/* Hero Section */}
-      <section className="relative h-[500px] md:h-[600px] w-full">
-        <div className="absolute inset-0 bg-black/50 z-10" />
-        <Image
-          src="/hero pizza.avif"
-          alt="Délicieuses pizzas"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="relative z-20 container mx-auto h-full flex flex-col justify-center items-start text-white">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">Pizza Casa</h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-xl">
-            Les meilleures pizzas de Libreville, livrées directement chez vous
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Button size="lg" asChild>
-              <Link href="/pizzerias">Commander maintenant</Link>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white text-black hover:bg-white hover:text-black"
-              asChild
-            >
-              <Link href="/inscription">Créer un compte</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      <HeroCarousel />
+
 
       {/* How It Works */}
       <section className="py-16 bg-muted">
@@ -89,9 +62,13 @@ export default function Home() {
             </Button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {popularPizzas.map((pizza) => (
-              <PizzaCard key={pizza.id} pizza={pizza} />
-            ))}
+            {popularPizzas.length > 0 ? (
+              popularPizzas.map((pizza) => (
+                <PizzaCard key={pizza.id} pizza={pizza} />
+              ))
+            ) : (
+              <p>Aucune pizza populaire trouvée.</p>
+            )}
           </div>
         </div>
       </section>
@@ -108,9 +85,13 @@ export default function Home() {
             </Button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {nearbyPizzerias.map((pizzeria) => (
-              <PizzeriaCard key={pizzeria.id} pizzeria={pizzeria} />
-            ))}
+            {nearbyPizzerias.length > 0 ? (
+              nearbyPizzerias.map((pizzeria) => (
+                <PizzeriaCard key={pizzeria.id} pizzeria={pizzeria} />
+              ))
+            ) : (
+              <p>Aucune pizzeria à proximité trouvée.</p>
+            )}
           </div>
         </div>
       </section>
