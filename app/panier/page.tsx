@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
 import { useCart } from "@/context/cart-context"
@@ -23,13 +22,22 @@ export default function CartPage() {
   const { user } = useAuth()
   const { items, updateQuantity, removeItem, clearCart, pizzeriaId, subtotal, deliveryFee, total } = useCart()
 
-  const [deliveryAddress, setDeliveryAddress] = useState(user?.address || "")
-  const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "mobile">("cash")
+  const [deliveryAddress, setDeliveryAddress] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
+  const [addressTouched, setAddressTouched] = useState(false)
 
   const pizzeria = pizzeriaId ? getPizzeriaById(pizzeriaId) : null
 
-  // Format price in FCFA
+  useEffect(() => {
+    // Récupérer l'adresse depuis localStorage si elle existe
+    const savedAddress = localStorage.getItem("deliveryAddress")
+    if (savedAddress) {
+      setDeliveryAddress(savedAddress)
+    } else if (user?.address) {
+      setDeliveryAddress(user.address)
+    }
+  }, [user])
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-FR").format(price) + " FCFA"
   }
@@ -46,6 +54,7 @@ export default function CartPage() {
     }
 
     if (!deliveryAddress) {
+      setAddressTouched(true)
       toast({
         title: "Adresse requise",
         description: "Veuillez saisir une adresse de livraison.",
@@ -54,18 +63,11 @@ export default function CartPage() {
       return
     }
 
-    setIsProcessing(true)
+    // Sauvegarder l'adresse dans localStorage pour la récupérer dans les étapes suivantes
+    localStorage.setItem("deliveryAddress", deliveryAddress)
 
-    // Simulate order processing
-    setTimeout(() => {
-      toast({
-        title: "Commande confirmée",
-        description: "Votre commande a été confirmée et est en cours de préparation.",
-      })
-      clearCart()
-      router.push("/commandes")
-      setIsProcessing(false)
-    }, 2000)
+    setIsProcessing(true)
+    router.push("/paiement")
   }
 
   if (items.length === 0) {
@@ -206,36 +208,32 @@ export default function CartPage() {
 
                 <div className="space-y-4 pt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="address">Adresse de livraison</Label>
+                    <Label htmlFor="address">Adresse de livraison *</Label>
                     <Input
                       id="address"
                       placeholder="123 Rue des Palmiers, Libreville"
                       value={deliveryAddress}
-                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      onChange={(e) => {
+                        setDeliveryAddress(e.target.value)
+                        setAddressTouched(true)
+                      }}
+                      className={addressTouched && !deliveryAddress ? "border-destructive" : ""}
                     />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="payment">Méthode de paiement</Label>
-                    <Select
-                      value={paymentMethod}
-                      onValueChange={(value) => setPaymentMethod(value as "cash" | "card" | "mobile")}
-                    >
-                      <SelectTrigger id="payment">
-                        <SelectValue placeholder="Choisir une méthode de paiement" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="cash">Paiement à la livraison</SelectItem>
-                        <SelectItem value="card">Carte bancaire</SelectItem>
-                        <SelectItem value="mobile">Mobile Money</SelectItem>
-                      </SelectContent>
-                    </Select>
+                    {addressTouched && !deliveryAddress && (
+                      <p className="text-sm text-destructive">Ce champ est obligatoire</p>
+                    )}
                   </div>
                 </div>
               </CardContent>
               <CardFooter>
-                <Button className="w-full" size="lg" onClick={handleCheckout} disabled={isProcessing}>
-                  {isProcessing ? "Traitement en cours..." : "Commander"}
+                <Button
+                  className="w-full"
+                  size="lg"
+                  onClick={handleCheckout}
+                  disabled={isProcessing || !deliveryAddress}
+                >
+                  {isProcessing ? "Traitement en cours..." : "Passer la commande"}
+                  {isProcessing && <span className="ml-2 spinner-border spinner-border-sm" />}
                 </Button>
               </CardFooter>
             </Card>

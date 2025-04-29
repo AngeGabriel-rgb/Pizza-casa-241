@@ -59,3 +59,22 @@ export interface Order {
   createdAt: string
   livreurId?: string
 }
+
+export type CartItem = {
+  id: string
+  image?: string
+  name: string
+  price: number
+  description?: string
+  options?: string
+  quantity: number
+}
+
+
+export interface CartContextType {
+  items: CartItem[];
+  updateQuantity: (id: number, quantity: number) => void;
+  removeItem: (id: number) => void;
+  getTotal: () => number;
+  totalItems: number; // Add this property// Add this method to calculate the total
+}
