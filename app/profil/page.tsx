@@ -42,12 +42,12 @@ export default function AccountPage() {
   const router = useRouter()
   const { toast } = useToast()
   const { user, logout } = useAuth()
-  const [activeTab, setActiveTab] = useState("profile")
+  const [activeTab, setActiveTab] = useState("profil")
 
   // Redirect if not logged in
   useEffect(() => {
     if (!user) {
-      router.push("/connexion")
+      router.push("/register")
     }
   }, [user, router])
 

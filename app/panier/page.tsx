@@ -49,7 +49,7 @@ export default function CartPage() {
         description: "Veuillez vous connecter pour finaliser votre commande.",
         variant: "destructive",
       })
-      router.push("/connexion")
+      router.push("/paiement")
       return
     }
 
@@ -65,7 +65,7 @@ export default function CartPage() {
 
     // Sauvegarder l'adresse dans localStorage pour la récupérer dans les étapes suivantes
     localStorage.setItem("deliveryAddress", deliveryAddress)
-
+    
     setIsProcessing(true)
     router.push("/paiement")
   }
@@ -211,7 +211,7 @@ export default function CartPage() {
                     <Label htmlFor="address">Adresse de livraison *</Label>
                     <Input
                       id="address"
-                      placeholder="123 Rue des Palmiers, Libreville"
+                      placeholder="bord de mer, Libreville"
                       value={deliveryAddress}
                       onChange={(e) => {
                         setDeliveryAddress(e.target.value)

@@ -128,12 +128,12 @@ export default function Home() {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/connexion" className="text-muted-foreground hover:text-foreground">
-                    Connexion
+                  <Link href="/login" className="text-muted-foreground hover:text-foreground">
+                    login
                   </Link>
                 </li>
                 <li>
-                  <Link href="/inscription" className="text-muted-foreground hover:text-foreground">
+                  <Link href="/register" className="text-muted-foreground hover:text-foreground">
                     Inscription
                   </Link>
                 </li>

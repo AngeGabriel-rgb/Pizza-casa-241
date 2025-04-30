@@ -1,21 +1,18 @@
 "use client"
-
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { MainNav } from "@/components/layout/main-nav"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
-import { useAuth } from "@/context/auth-context"
+import { signup } from "../login/actions"
+
 
 export default function RegisterPage() {
   const router = useRouter()
-  const { register } = useAuth()
   const { toast } = useToast()
   const [formData, setFormData] = useState({
     name: "",
@@ -34,7 +31,17 @@ export default function RegisterPage() {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
-
+    console.log("Registering user:", formData);
+    
+    const data = {
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      address: formData.address,
+      phone: formData.phone,
+      role: "client",
+    }
+   
     // Validate form
     if (formData.password !== formData.confirmPassword) {
       toast({
@@ -45,48 +52,12 @@ export default function RegisterPage() {
       return
     }
 
-    setIsLoading(true)
-
-    try {
-      const success = await register(
-        {
-          name: formData.name,
-          email: formData.email,
-          role: "client",
-          address: formData.address,
-          phone: formData.phone,
-        },
-        formData.password,
-      )
-
-      if (success) {
-        toast({
-          title: "Inscription réussie",
-          description: "Votre compte a été créé avec succès.",
-        })
-        router.push("/")
-      } else {
-        toast({
-          title: "Erreur d'inscription",
-          description: "Cet email est déjà utilisé ou une erreur est survenue.",
-          variant: "destructive",
-        })
-      }
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
+    const result = await signup(data)
+  
   }
 
   return (
     <div className="flex flex-col min-h-screen">
-      <MainNav />
-
       <main className="flex-1 container max-w-md py-12">
         <Card>
           <CardHeader className="space-y-1">
@@ -140,7 +111,7 @@ export default function RegisterPage() {
                   <Input
                     id="address"
                     name="address"
-                    placeholder="123 Rue des Palmiers, Libreville"
+                    placeholder="alibandeng, Libreville"
                     value={formData.address}
                     onChange={handleChange}
                     required
@@ -180,7 +151,7 @@ export default function RegisterPage() {
           <CardFooter className="flex flex-col space-y-4">
             <div className="text-center text-sm text-muted-foreground">
               <span>Vous avez déjà un compte? </span>
-              <Link href="/connexion" className="text-primary hover:underline">
+              <Link href="/login" className="text-primary hover:underline">
                 Se connecter
               </Link>
             </div>

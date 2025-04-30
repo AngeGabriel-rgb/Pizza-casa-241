@@ -200,7 +200,7 @@ export function MainNav() {
             </DropdownMenu>
           ) : (
             <Button asChild>
-              <Link href="/connexion">Connexion</Link>
+              <Link href="/login">Connexion</Link>
             </Button>
           )}
 
