@@ -67,7 +67,7 @@ export default function CartPage() {
     localStorage.setItem("deliveryAddress", deliveryAddress)
     
     setIsProcessing(true)
-    router.push("/checkout")
+    router.push("/paiement")
   }
 
   if (items.length === 0) {

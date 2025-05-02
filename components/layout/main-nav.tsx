@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -29,7 +28,6 @@ export function MainNav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
-  // Define navigation links based on user role
   const getNavLinks = () => {
     const commonLinks = [
       { href: "/", label: "Accueil" },
@@ -67,7 +65,6 @@ export function MainNav() {
 
   const navLinks = getNavLinks()
 
-  // Get role icon
   const getRoleIcon = () => {
     if (!user) return <User className="h-4 w-4 mr-2" />
 
@@ -85,7 +82,6 @@ export function MainNav() {
     }
   }
 
-  // Handle search submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     if (searchQuery.trim()) {
@@ -105,7 +101,6 @@ export function MainNav() {
           </Link>
         </div>
 
-        {/* Desktop Navigation - Centered */}
         <nav className="hidden md:flex items-center justify-center space-x-6 text-sm font-medium flex-1">
           {navLinks.map((link) => (
             <Link
@@ -123,7 +118,6 @@ export function MainNav() {
           ))}
         </nav>
 
-        {/* Search Bar - Only show for non-pizzeria users */}
         {(!user || user.role !== "pizzeria") && (
           <form onSubmit={handleSearch} className="hidden md:flex mx-4 flex-1 max-w-xs">
             <div className="relative w-full">
@@ -157,7 +151,6 @@ export function MainNav() {
         )}
 
         <div className="flex items-center space-x-2 ml-auto">
-          {/* Cart Button - Only show for clients */}
           {(!user || user.role === "client") && (
             <Button variant="outline" size="icon" asChild>
               <Link href="/panier" className="relative">
@@ -171,10 +164,8 @@ export function MainNav() {
             </Button>
           )}
 
-          {/* Theme Toggle */}
           <ModeToggle />
 
-          {/* User Menu */}
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -204,7 +195,6 @@ export function MainNav() {
             </Button>
           )}
 
-          {/* Mobile Menu Toggle */}
           <Button
             variant="outline"
             size="icon"
@@ -216,7 +206,6 @@ export function MainNav() {
         </div>
       </div>
 
-      {/* Mobile Navigation */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t">
           <div className="container py-4 space-y-3">
