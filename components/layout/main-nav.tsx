@@ -187,7 +187,7 @@ export function MainNav() {
                 <DropdownMenuLabel>Mon Compte</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/profil">
+                  <Link href="/profile">
                     <User className="h-4 w-4 mr-2" />
                     Profil
                   </Link>
@@ -264,7 +264,7 @@ export function MainNav() {
             ))}
             {!user && (
               <Link
-                href="/inscription"
+                href="/register"
                 className="block py-2 text-center text-foreground/60 transition-colors hover:text-foreground/80"
                 onClick={() => setMobileMenuOpen(false)}
               >

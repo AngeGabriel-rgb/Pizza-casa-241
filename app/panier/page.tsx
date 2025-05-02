@@ -49,7 +49,7 @@ export default function CartPage() {
         description: "Veuillez vous connecter pour finaliser votre commande.",
         variant: "destructive",
       })
-      router.push("/paiement")
+      router.push("/register")
       return
     }
 
@@ -67,7 +67,7 @@ export default function CartPage() {
     localStorage.setItem("deliveryAddress", deliveryAddress)
     
     setIsProcessing(true)
-    router.push("/paiement")
+    router.push("/checkout")
   }
 
   if (items.length === 0) {
