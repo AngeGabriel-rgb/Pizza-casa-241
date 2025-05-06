@@ -10,7 +10,7 @@ export const pizzerias: Pizzeria[] = [
     rating: 4.7,
     reviewCount: 124,
     deliveryTime: "30-45 min",
-    deliveryFee: 1500,
+    deliveryFee: 2000,
     minOrder: 5000,
     location: {
       lat: 0.4162,
@@ -22,16 +22,17 @@ export const pizzerias: Pizzeria[] = [
     },
     isOpen: true,
   },
+  // ajout de la pizzeria Pizzeria Roma
   {
     id: "2",
     name: "Pizzeria Roma",
     address: "12 Boulevard du Bord de Mer, Libreville",
-    logo: "/piazza.jpeg?height=80&width=80",
+    logo: "/devant2.avif",
     coverImage: "/piazza.jpeg?height=300&width=600",
     rating: 4.5,
     reviewCount: 98,
     deliveryTime: "25-40 min",
-    deliveryFee: 1000,
+    deliveryFee: 2000,
     minOrder: 4000,
     location: {
       lat: 0.4052,
@@ -43,12 +44,13 @@ export const pizzerias: Pizzeria[] = [
     },
     isOpen: true,
   },
+  // ajout de la pizzeria Pizza Hut
   {
     id: "3",
-    name: "Pizza Express Owendo",
-    address: "78 Rue des Palmiers, Owendo",
-    logo: "/placeholder.svg?height=80&width=80",
-    coverImage: "/placeholder.svg?height=300&width=600",
+    name: "Pizza Hut Glass",
+    address: "Glass",
+    logo: "/pizza hut.jpg",
+    coverImage: "/devant15.avif",
     rating: 4.3,
     reviewCount: 76,
     deliveryTime: "35-50 min",
@@ -64,16 +66,17 @@ export const pizzerias: Pizzeria[] = [
     },
     isOpen: true,
   },
+  // ajout de la pizzeria Mamma Mia
   {
     id: "4",
     name: "Mamma Mia Akanda",
     address: "23 Avenue des Cocotiers, Akanda",
     logo: "/mama_mia.jpeg?height=80&width=80",
-    coverImage: "/mama_mia.jpeg?height=300&width=600",
+    coverImage: "/devant1.avif",
     rating: 4.8,
     reviewCount: 112,
     deliveryTime: "40-55 min",
-    deliveryFee: 2500,
+    deliveryFee: 2000,
     minOrder: 7000,
     location: {
       lat: 0.4562,
@@ -85,16 +88,17 @@ export const pizzerias: Pizzeria[] = [
     },
     isOpen: true,
   },
+  // ajout de la pizzeria Sauce Creole
   {
     id: "5",
-    name: "Pizza Bella Ntoum",
-    address: "5 Route Nationale, Ntoum",
-    logo: "/placeholder.svg?height=80&width=80",
-    coverImage: "/placeholder.svg?height=300&width=600",
+    name: "La Sauce Creole",
+    address: "Charbonnages",
+    logo: "/sauce creole.jpg",
+    coverImage: "/devantsaucecreole.png",
     rating: 4.2,
     reviewCount: 45,
     deliveryTime: "50-65 min",
-    deliveryFee: 3000,
+    deliveryFee: 2000,
     minOrder: 8000,
     location: {
       lat: 0.3852,
@@ -104,7 +108,51 @@ export const pizzerias: Pizzeria[] = [
       open: "11:00",
       close: "21:00",
     },
-    isOpen: false,
+    isOpen: true,
+  },
+  // ajout de la pizzeria Tivoli
+  {
+    id: "6",
+    name: "Tivoli",
+    address: "Tivoli, Glass",
+    logo: "/tivoli.jpg",
+    coverImage: "/tivoli.jpg",
+    rating: 5.0,
+    reviewCount: 112,
+    deliveryTime: "40-55 min",
+    deliveryFee: 2000,
+    minOrder: 7000,
+    location: {
+      lat: 0.4562,
+      lng: 9.4873,
+    },
+    openingHours: {
+      open: "12:00",
+      close: "23:30",
+    },
+    isOpen: true,
+  },
+  // ajout de la pizzeria Yeunil
+  {
+    id: "7",
+    name: "Yeunil",
+    address: "Charbonnages, ABC MALL",
+    logo: "/yeunil.png",
+    coverImage: "/ban yeunil.jpg",
+    rating: 5.0,
+    reviewCount: 112,
+    deliveryTime: "40-55 min",
+    deliveryFee: 2000,
+    minOrder: 7000,
+    location: {
+      lat: 0.4562,
+      lng: 9.4873,
+    },
+    openingHours: {
+      open: "12:00",
+      close: "23:30",
+    },
+    isOpen: true,
   },
 ]
 
@@ -129,7 +177,7 @@ export const getPizzeriaById = (id: string): Pizzeria | undefined => {
 export const getNearbyPizzerias = (
   userLat = 0.4162, // Default to Libreville center
   userLng = 9.4673,
-  maxDistance = 10, // km
+  maxDistance?: number, // Rendre maxDistance optionnel
 ): Pizzeria[] => {
   return pizzerias
     .map((pizzeria) => {
@@ -140,6 +188,6 @@ export const getNearbyPizzerias = (
         distance,
       }
     })
-    .filter((pizzeria) => pizzeria.distance <= maxDistance)
+    .filter((pizzeria) => (maxDistance ? pizzeria.distance <= maxDistance : true)) // Appliquer le filtre uniquement si maxDistance est défini
     .sort((a, b) => (a.distance || 0) - (b.distance || 0))
 }

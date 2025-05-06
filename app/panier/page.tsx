@@ -20,7 +20,7 @@ export default function CartPage() {
   const router = useRouter()
   const { toast } = useToast()
   const { user } = useAuth()
-  const { items, updateQuantity, removeItem, clearCart, pizzeriaId, subtotal, deliveryFee, total } = useCart()
+  const { items, updateQuantity, removeItem, clearCart, pizzeriaId, subtotal, total } = useCart()
 
   const [deliveryAddress, setDeliveryAddress] = useState("")
   const [isProcessing, setIsProcessing] = useState(false)
@@ -65,9 +65,22 @@ export default function CartPage() {
 
     // Sauvegarder l'adresse dans localStorage pour la récupérer dans les étapes suivantes
     localStorage.setItem("deliveryAddress", deliveryAddress)
-    
+
     setIsProcessing(true)
-    router.push("/paiement")
+
+    // Générer un ID de commande temporaire
+    const tempOrderId = `ORD-${Date.now()}`
+
+    // Calculer les frais de livraison
+    const deliveryFee = subtotal > 0 ? 1500 : 0;
+
+    // Calculer le total avec les frais de livraison
+    const totalWithDelivery = Number(total) + deliveryFee;
+
+    // S'assurer que les valeurs sont des nombres et non des chaînes
+    const paymentUrl = `/paiement?total=${Number(totalWithDelivery)}&subtotal=${Number(subtotal)}&deliveryFee=${Number(deliveryFee)}&address=${encodeURIComponent(deliveryAddress)}&orderId=${tempOrderId}`
+
+    router.push(paymentUrl)
   }
 
   if (items.length === 0) {
@@ -195,10 +208,12 @@ export default function CartPage() {
                     <span className="text-muted-foreground">Sous-total</span>
                     <span>{formatPrice(subtotal)}</span>
                   </div>
+                 {/*
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Frais de livraison</span>
                     <span>{formatPrice(deliveryFee)}</span>
                   </div>
+                  */}
                   <Separator className="my-2" />
                   <div className="flex justify-between font-semibold text-lg">
                     <span>Total</span>

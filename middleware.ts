@@ -17,3 +17,6 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
+
+// Autoriser l'accès à cette page sans authentification
+const PUBLIC_ROUTES = ['/verify-email'];

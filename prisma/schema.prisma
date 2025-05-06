@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Utilisateurs {
+  id_utilisateur Int       @id @default(autoincrement())
+  nom            String
+  prenom         String
+  email          String    @unique
+  mot_de_passe   String
+  telephone      String?
+  role           String?
+  commandes      Commandes[]
+  avis           Avis[]
+}
+
+model Pizzerias {
+  id_pizzaria     Int       @id @default(autoincrement())
+  nom_pizzaria    String
+  adresse         String
+  description     String?
+  horaire_ouverture String?
+  status          String?
+  menus           Menus[]
+  commandes       Commandes[]
+  avis            Avis[]
+}
+
+model Menus {
+  id_pizza       Int       @id @default(autoincrement())
+  pizzaria_id    Int
+  pizzerias      Pizzerias @relation(fields: [pizzaria_id], references: [id_pizzaria])
+  nom            String
+  description    String?
+  prix           Float
+  image_url      String?
+  disponibilité  Boolean   @default(true)
+}
+
+model Commandes {
+  id_commande    Int       @id @default(autoincrement())
+  client_id      Int
+  utilisateurs   Utilisateurs @relation(fields: [client_id], references: [id_utilisateur])
+  pizzaria_id    Int
+  pizzerias      Pizzerias @relation(fields: [pizzaria_id], references: [id_pizzaria])
+  status         String
+  prix_total     Float
+  id_addresses   Int?
+  date_commande  DateTime  @default(now())
+  paiement       Paiement?
+}
+
+model Avis {
+  id_avis        Int       @id @default(autoincrement())
+  client_id      Int
+  utilisateurs   Utilisateurs @relation(fields: [client_id], references: [id_utilisateur])
+  pizzaria_id    Int
+  pizzerias      Pizzerias @relation(fields: [pizzaria_id], references: [id_pizzaria])
+  note           Int
+  commentaire    String?
+}
+
+model Paiement {
+  id_paiement    Int       @id @default(autoincrement())
+  commande_id    Int       @unique
+  commandes      Commandes @relation(fields: [commande_id], references: [id_commande])
+  montant        Float
+  mode_de_paiement String
+  statuts        String
+  date_de_paiement DateTime @default(now())
+}

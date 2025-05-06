@@ -49,7 +49,7 @@ export default function HeroCarousel() {
 
   // Défilement automatique
   useEffect(() => {
-    const interval = setInterval(goToNext, 8000)
+    const interval = setInterval(goToNext, 10000)
     return () => clearInterval(interval)
   }, [goToNext])
 
@@ -100,11 +100,7 @@ export default function HeroCarousel() {
                 Trouver une pizzeria
               </Button>
             </Link>
-            <Link href="/register">
-              <Button size="lg" variant="outline" className="border-white text-black hover:bg-white hover:text-yellow-900">
-                Creer un compte
-              </Button>
-            </Link>
+       
           </div>
         </div>
       </div>

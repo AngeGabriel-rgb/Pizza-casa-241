@@ -31,7 +31,7 @@ export default function OrdersPage() {
   useEffect(() => {
     // Simuler le chargement des commandes depuis une API
     // Dans une application réelle, vous feriez un appel API ici
-     const mockOrders: Order[] = [
+    const mockOrders: Order[] = [
       {
         id: "ORD123456",
         date: "2023-04-28T14:30:00",
@@ -86,23 +86,6 @@ export default function OrdersPage() {
       case "livree":
         return { icon: <CheckCircle2 className="h-5 w-5" />, color: "text-green-500", text: "Livrée" }
     }
-  }
-
-  if (!user) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <MainNav />
-        <main className="flex-1 container py-12 text-center">
-          <div className="max-w-md mx-auto">
-            <h1 className="text-2xl font-bold mb-4">Connexion requise</h1>
-            <p className="text-muted-foreground mb-8">Veuillez vous connecter pour voir vos commandes.</p>
-            <Button asChild>
-              <Link href="/connexion">Se connecter</Link>
-            </Button>
-          </div>
-        </main>
-      </div>
-    )
   }
 
   return (

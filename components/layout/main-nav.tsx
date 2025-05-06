@@ -90,12 +90,12 @@ export function MainNav() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white">
+    <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="container flex h-16 items-center">
         <div className="flex items-center">
           <Link href="/" className="flex items-center gap-2">
-            <div className="relative h-16 w-16 h-20 w-20">
-              <Image src="sep13.png" alt="Pizza Casa Logo" fill className="object-contain" />
+            <div className="relative h-16 w-16 md:h-20 md:w-20">
+              <Image src="/sep13.png" alt="Pizza Casa Logo" fill className="object-contain" />
             </div>
             <span className="text-2xl font-bold text-[#9B1B1B] font-montserrat">Pizza Casa</span>
           </Link>
@@ -166,34 +166,54 @@ export function MainNav() {
 
           <ModeToggle />
 
-          {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="ml-2">
-                  {getRoleIcon()}
-                  <span className="max-w-[100px] truncate">{user.name}</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Mon Compte</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/profile">
-                    <User className="h-4 w-4 mr-2" />
-                    Profil
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={logout}>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Déconnexion
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Button asChild>
-              <Link href="/login">Connexion</Link>
-            </Button>
-          )}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="icon" className="rounded-full">
+                <User className="h-5 w-5" />
+                <span className="sr-only">Mon profil</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {user ? (
+                <>
+                  <DropdownMenuLabel>
+                    <div className="flex items-center gap-2">
+                      {getRoleIcon()}
+                      <span className="max-w-[150px] truncate">{user.name}</span>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">
+                      <User className="h-4 w-4 mr-2" />
+                      Profil
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Déconnexion
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuLabel>Mon Compte</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/login">
+                      <User className="h-4 w-4 mr-2" />
+                      Connexion
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/register">
+                      <User className="h-4 w-4 mr-2" />
+                      Inscription
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           <Button
             variant="outline"
@@ -251,15 +271,6 @@ export function MainNav() {
                 {link.label}
               </Link>
             ))}
-            {!user && (
-              <Link
-                href="/register"
-                className="block py-2 text-center text-foreground/60 transition-colors hover:text-foreground/80"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Inscription
-              </Link>
-            )}
           </div>
         </div>
       )}

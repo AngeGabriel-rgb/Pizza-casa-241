@@ -72,7 +72,7 @@ export default function AuthForm({ type }: { type: 'login' | 'register' }) {
               onChange={(e) => setFullName(e.target.value)}
               required
               className="w-full p-2 border border-gray-300 rounded focus:ring-2 focus:ring-[#ac1f1f] focus:border-[#ac1f1f]"
-              placeholder="Jean Dupont"
+              placeholder="ange Gabriel"
             />
           </div>
           <div>

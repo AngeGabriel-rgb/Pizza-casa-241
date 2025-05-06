@@ -76,7 +76,7 @@ export default function PizzeriaPage() {
             <div className="container flex items-center gap-4">
               <div className="h-20 w-20 relative bg-white rounded-full overflow-hidden border-2 border-white">
                 <Image
-                  src={pizzeria.logo || "/placeholder.svg"}
+                  src={pizzeria.logo || "/logo.jpg"}
                   alt={`Logo ${pizzeria.name}`}
                   fill
                   className="object-cover"

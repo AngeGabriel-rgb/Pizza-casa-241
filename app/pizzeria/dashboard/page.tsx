@@ -58,7 +58,7 @@ export default function PizzeriaDashboardPage() {
               Vous devez être connecté en tant que pizzeria pour accéder à cette page.
             </p>
             <Button asChild>
-              <Link href="/connexion">Se connecter</Link>
+              <Link href="/login">Se connecter</Link>
             </Button>
           </div>
         </main>
