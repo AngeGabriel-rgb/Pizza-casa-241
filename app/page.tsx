@@ -9,6 +9,7 @@ import { getNearbyPizzerias } from "@/data/pizzerias"
 import { ArrowRight, MapPin, Pizza, Truck } from "lucide-react"
 import HeroCarousel from "@/components/hero-carousel"
 
+
 export default function Home() {
   const popularPizzas = getPopularPizzas().slice(0, 4);
   const nearbyPizzerias = getNearbyPizzerias().slice(0, 3);
