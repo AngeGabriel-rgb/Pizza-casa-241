@@ -1,82 +1,77 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
-model Utilisateurs {
-  id_utilisateur Int       @id @default(autoincrement())
-  nom            String
-  prenom         String
-  email          String    @unique
-  mot_de_passe   String
-  telephone      String?
-  role           String?
-  commandes      Commandes[]
-  avis           Avis[]
+model User {
+  id        String  @id @default(uuid()) // Correspond à auth.users.id
+  email     String  @unique
+  firstName String
+  lastName  String
+  phone     String?
+  role      String?
+  orders    Order[]
+  reviews   Review[]
+
+  @@map("users") // Pour correspondre à la table Supabase
 }
 
-model Pizzerias {
-  id_pizzaria     Int       @id @default(autoincrement())
-  nom_pizzaria    String
-  adresse         String
-  description     String?
-  horaire_ouverture String?
-  status          String?
-  menus           Menus[]
-  commandes       Commandes[]
-  avis            Avis[]
+model Pizzeria {
+  id          Int       @id @default(autoincrement())
+  name        String
+  address     String
+  description String?
+  openingHours String?
+  status      String?
+  menus       Menu[]
+  orders      Order[]
+  reviews     Review[]
 }
 
-model Menus {
-  id_pizza       Int       @id @default(autoincrement())
-  pizzaria_id    Int
-  pizzerias      Pizzerias @relation(fields: [pizzaria_id], references: [id_pizzaria])
-  nom            String
-  description    String?
-  prix           Float
-  image_url      String?
-  disponibilité  Boolean   @default(true)
+model Menu {
+  id          Int       @id @default(autoincrement())
+  pizzeriaId  Int
+  pizzeria    Pizzeria @relation(fields: [pizzeriaId], references: [id])
+  name        String
+  description String?
+  price       Float
+  imageUrl    String?
+  available   Boolean   @default(true)
 }
 
-model Commandes {
-  id_commande    Int       @id @default(autoincrement())
-  client_id      Int
-  utilisateurs   Utilisateurs @relation(fields: [client_id], references: [id_utilisateur])
-  pizzaria_id    Int
-  pizzerias      Pizzerias @relation(fields: [pizzaria_id], references: [id_pizzaria])
-  status         String
-  prix_total     Float
-  id_addresses   Int?
-  date_commande  DateTime  @default(now())
-  paiement       Paiement?
+model Order {
+  id         Int      @id @default(autoincrement())
+  customerId String @default(uuid())
+  customer   User   @relation(fields: [customerId], references: [id])
+  pizzeriaId Int
+  pizzeria   Pizzeria @relation(fields: [pizzeriaId], references: [id])
+  status     String
+  totalPrice Float
+  orderDate  DateTime @default(now())
+  payment    Payment?
 }
 
-model Avis {
-  id_avis        Int       @id @default(autoincrement())
-  client_id      Int
-  utilisateurs   Utilisateurs @relation(fields: [client_id], references: [id_utilisateur])
-  pizzaria_id    Int
-  pizzerias      Pizzerias @relation(fields: [pizzaria_id], references: [id_pizzaria])
-  note           Int
-  commentaire    String?
+model Review {
+  id         Int      @id @default(autoincrement())
+  customerId String
+  customer   User     @relation(fields: [customerId], references: [id])
+  pizzeriaId Int
+  pizzeria   Pizzeria @relation(fields: [pizzeriaId], references: [id])
+  rating     Int
+  comment    String?
 }
 
-model Paiement {
-  id_paiement    Int       @id @default(autoincrement())
-  commande_id    Int       @unique
-  commandes      Commandes @relation(fields: [commande_id], references: [id_commande])
-  montant        Float
-  mode_de_paiement String
-  statuts        String
-  date_de_paiement DateTime @default(now())
+model Payment {
+  id           Int      @id @default(autoincrement())
+  orderId      Int      @unique
+  order        Order    @relation(fields: [orderId], references: [id])
+  amount       Float
+  paymentMethod String
+  status       String
+  paymentDate  DateTime @default(now())
 }

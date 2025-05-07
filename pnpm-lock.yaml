@@ -119,6 +119,9 @@ importers:
       date-fns:
         specifier: 4.1.0
         version: 4.1.0
+      ebilling-js:
+        specifier: ^0.1.1
+        version: 0.1.1
       embla-carousel-react:
         specifier: 8.5.1
         version: 8.5.1(react@19.1.0)
@@ -1382,6 +1385,9 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
 
+  base-64@1.0.0:
+    resolution: {integrity: sha512-kwDPIFCGx0NZHog36dj+tHiwP4QMzsZ3AgMViUBKI0+V5n4U0ufTCUMhnQ04diaRI8EX/QcPfql7zlhZ7j4zgg==}
+
   binary-extensions@2.3.0:
     resolution: {integrity: sha512-Ceh+7ox5qe7LJuLHoY0feh3pHuUDHAcRUeyL2VYghZwfpkNIy/+8Ocg0a3UuSoYzavmylwuLWQOf3hl0jjMMIw==}
     engines: {node: '>=8'}
@@ -1540,6 +1546,9 @@ packages:
 
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
+
+  ebilling-js@0.1.1:
+    resolution: {integrity: sha512-Dzt0FQOinTARwK0B1lrADj7nM1Ov6NtT9qL5rvSZ9eeiukJ8GudmRHEY/0msxzhh2dhf0AaB8dvFcBXV+x8zDw==}
 
   electron-to-chromium@1.5.140:
     resolution: {integrity: sha512-o82Rj+ONp4Ip7Cl1r7lrqx/pXhbp/lh9DpKcMNscFJdh8ebyRofnc7Sh01B4jx403RI0oqTBvlZ7OBIZLMr2+Q==}
@@ -3300,6 +3309,8 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
+  base-64@1.0.0: {}
+
   binary-extensions@2.3.0: {}
 
   brace-expansion@2.0.1:
@@ -3450,6 +3461,10 @@ snapshots:
       csstype: 3.1.3
 
   eastasianwidth@0.2.0: {}
+
+  ebilling-js@0.1.1:
+    dependencies:
+      base-64: 1.0.0
 
   electron-to-chromium@1.5.140: {}
 
