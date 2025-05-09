@@ -49,7 +49,7 @@ export default function CartPage() {
         description: "Veuillez vous connecter pour finaliser votre commande.",
         variant: "destructive",
       })
-      router.push("/register")
+      router.push("/paiement")
       return
     }
 
