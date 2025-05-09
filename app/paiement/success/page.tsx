@@ -116,7 +116,7 @@ export default function PaymentSuccessPage() {
           </Button>
           
           <p className="text-xs text-muted-foreground pt-2">
-            Un problème avec votre commande ? <Link href="/contact" className="underline">Contactez-nous</Link>
+            Un problème avec votre commande ? <Link href="/support" className="underline">Contactez-nous</Link>
           </p>
         </div>
       </div>

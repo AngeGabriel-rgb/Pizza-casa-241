@@ -95,7 +95,7 @@ export default function PaymentFormPage() {
         {/* Formulaire de paiement */}
         <Card>
           <CardHeader>
-            <CardTitle>Paiement EBilling</CardTitle>
+            <CardTitle>Finalisez votre paiement !</CardTitle>
             <CardDescription>Entrez votre numéro pour recevoir la demande de paiement</CardDescription>
           </CardHeader>
           <CardContent>
@@ -125,7 +125,7 @@ export default function PaymentFormPage() {
                     Traitement en cours...
                   </span>
                 ) : (
-                  "Payer avec EBilling"
+                  "Poursuivre le paiement"
                 )}
               </Button>
             </form>
