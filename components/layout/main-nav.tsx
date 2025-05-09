@@ -81,13 +81,30 @@ export function MainNav() {
         return <User className="h-4 w-4 mr-2" />
     }
   }
+  const pizzerias = [
+    { id: 1, name: "Pizza Napoli", slug: "Pizza Napoli" },
+    { id: 2, name: "Pizzeria Roma", slug: "Pizzeria Roma" },
+    { id: 3, name: "Pizza Hut Glass", slug: "Pizza Hut Glass" },
+    { id: 4, name: "Mamma Mia Akanda", slug: "Mamma Mia Akanda" },
+    { id: 5, name: "La Sauce Creole", slug: "La Sauce Creole" },
+    { id: 6, name: "Tivoli", slug: "Tivoli" },
+    { id: 7, name: "Yeunil", slug: "Yeunil" },
+  ];
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      window.location.href = `/pizzerias?search=${encodeURIComponent(searchQuery)}`
+    e.preventDefault();
+    const query = searchQuery.trim().toLowerCase();
+  
+    // Trouver la pizzeria correspondante
+    const pizzeria = pizzerias.find((p) => p.name.toLowerCase() === query);
+  
+    if (pizzeria) {
+      // Rediriger vers la page dynamique de la pizzeria
+      window.location.href = `/pizzeria/${pizzeria.id}`;
+    } else {
+      alert("Pizzeria non trouvée !");
     }
-  }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background">
