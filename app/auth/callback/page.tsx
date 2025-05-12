@@ -1,5 +1,6 @@
-// app/auth/callback/page.tsx
 'use client'
+
+export const dynamic = 'force-dynamic' // Désactive le pré-rendering statique
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -11,7 +12,7 @@ export default function AuthCallback() {
   useEffect(() => {
     supabase.auth.onAuthStateChange(async (event) => {
       if (event === 'SIGNED_IN') {
-        router.push('/')
+        router.push('/paiement')
       }
     })
   }, [router])
@@ -22,3 +23,4 @@ export default function AuthCallback() {
     </div>
   )
 }
+
