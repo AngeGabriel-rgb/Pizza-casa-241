@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
-  "name": "pizza_casa",
-=======
   "name": "pizza-casa",
->>>>>>> dhen
   "version": "0.1.0",
   "private": true,
   "scripts": {
