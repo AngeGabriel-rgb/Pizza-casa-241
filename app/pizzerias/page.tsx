@@ -1,72 +1,98 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { MainNav } from "@/components/layout/main-nav"
-import { PizzeriaCard } from "@/components/pizzeria/pizzeria-card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import type { Pizzeria } from "@/types/pizza"
-import { getNearbyPizzerias } from "@/data/pizzerias"
-import { MapPin, Search } from "lucide-react"
+import { useState, useEffect } from "react";
+import { MainNav } from "@/components/layout/main-nav";
+import { PizzeriaCard } from "@/components/pizzeria/pizzeria-card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Pizzeria } from "@/types/pizza";
+import { getNearbyPizzerias } from "@/data/pizzerias";
+import { MapPin, Search } from "lucide-react";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+
+// Import Leaflet CSS
+import "leaflet/dist/leaflet.css";
+
+
 
 export default function PizzeriasPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [sortBy, setSortBy] = useState("distance")
-  const [filteredPizzerias, setFilteredPizzerias] = useState<Pizzeria[]>([])
-  const [userLocation, setUserLocation] = useState({ lat: 0.4162, lng: 9.4673 }) // Default to Libreville center
-  const [isLocating, setIsLocating] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortBy, setSortBy] = useState("distance");
+  const [filteredPizzerias, setFilteredPizzerias] = useState<Pizzeria[]>([]);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [isLocating, setIsLocating] = useState(false);
 
-  // Get user location
+  // Icône personnalisée pour le marqueur
+  const customIcon = new L.Icon({
+    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+  });
+
+  // Obtenir la position de l'utilisateur
   const getUserLocation = () => {
-    setIsLocating(true)
+    setIsLocating(true);
 
-    // Simulate geolocation API
-    setTimeout(() => {
-      // Randomize location slightly around Libreville
-      const randomLat = 0.4162 + (Math.random() - 0.5) * 0.05
-      const randomLng = 9.4673 + (Math.random() - 0.5) * 0.05
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+          setIsLocating(false);
+        },
+        (error) => {
+          console.error("Erreur de géolocalisation :", error);
+          alert("Impossible d'obtenir votre position.");
+          setIsLocating(false);
+        }
+      );
+    } else {
+      alert("La géolocalisation n'est pas prise en charge par votre navigateur.");
+      setIsLocating(false);
+    }
+  };
 
-      setUserLocation({ lat: randomLat, lng: randomLng })
-      setIsLocating(false)
-    }, 1500)
-  }
-
-  // Filter and sort pizzerias
+  // Filtrer et trier les pizzerias
   useEffect(() => {
-    let results = getNearbyPizzerias(userLocation.lat, userLocation.lng)
+    let results = getNearbyPizzerias(userLocation?.lat || 0, userLocation?.lng || 0);
 
-    // Apply search filter
+    // Appliquer le filtre de recherche
     if (searchTerm) {
-      const term = searchTerm.toLowerCase()
+      const term = searchTerm.toLowerCase();
       results = results.filter(
-        (pizzeria) => pizzeria.name.toLowerCase().includes(term) || pizzeria.address.toLowerCase().includes(term),
-      )
+        (pizzeria) =>
+          pizzeria.name.toLowerCase().includes(term) || pizzeria.address.toLowerCase().includes(term)
+      );
     }
 
-    // Apply sorting
+    // Appliquer le tri
     results.sort((a, b) => {
       switch (sortBy) {
         case "distance":
-          return (a.distance || 0) - (b.distance || 0)
+          return (a.distance || 0) - (b.distance || 0);
         case "rating":
-          return b.rating - a.rating
+          return b.rating - a.rating;
         case "deliveryTime":
-          // Convert delivery time range to average minutes for sorting
+          // Convertir la plage de temps de livraison en minutes moyennes pour le tri
           const getAvgTime = (time: string) => {
-            const [min, max] = time.split("-").map((t) => Number.parseInt(t))
-            return (min + max) / 2
-          }
-          return getAvgTime(a.deliveryTime) - getAvgTime(b.deliveryTime)
+            const [min, max] = time.split("-").map((t) => Number.parseInt(t));
+            return (min + max) / 2;
+          };
+          return getAvgTime(a.deliveryTime) - getAvgTime(b.deliveryTime);
         case "deliveryFee":
-          return a.deliveryFee - b.deliveryFee
+          return a.deliveryFee - b.deliveryFee;
         default:
-          return 0
+          return 0;
       }
-    })
+    });
 
-    setFilteredPizzerias(results)
-  }, [searchTerm, sortBy, userLocation])
+    setFilteredPizzerias(results);
+  }, [searchTerm, sortBy, userLocation]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -85,7 +111,30 @@ export default function PizzeriasPage() {
           </Button>
         </div>
 
-        {/* Search and Filter */}
+{/* Carte Leaflet */}
+{userLocation && (
+  <div className="flex justify-center items-center mb-8">
+    <MapContainer
+      center={[userLocation.lat, userLocation.lng]}
+      zoom={13}
+      maxZoom={18}
+      zoomControl={true}
+      style={{ height: "400px", width: "80%" }}
+    >
+      {/* Couches de base */}
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      />
+      {/* Marqueur pour la position de l'utilisateur */}
+      <Marker position={[userLocation.lat, userLocation.lng]} icon={customIcon}>
+        <Popup>Vous êtes ici</Popup>
+      </Marker>
+    </MapContainer>
+  </div>
+)}
+
+        {/* Recherche et tri */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="md:col-span-3 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -109,7 +158,7 @@ export default function PizzeriasPage() {
           </Select>
         </div>
 
-        {/* Results */}
+        {/* Résultats */}
         {filteredPizzerias.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredPizzerias.map((pizzeria) => (
@@ -124,5 +173,5 @@ export default function PizzeriasPage() {
         )}
       </main>
     </div>
-  )
+  );
 }
