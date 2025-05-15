@@ -1,10 +1,12 @@
 "use client"
 
+import type React from "react"
+
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/components/ui/use-toast"
@@ -20,13 +22,20 @@ export default function PaymentFormPage() {
   const { clearCart, subtotal: cartSubtotal, total: cartTotal, items } = useCart()
 
   const [isLoading, setIsLoading] = useState(false)
-  const [mobileNumber, setMobileNumber] = useState("")
+  const [deliveryAddress, setDeliveryAddress] = useState("")
 
   // Get order details from URL params
   const urlTotal = Number(searchParams.get("total") || "0")
   const urlSubtotal = Number(searchParams.get("subtotal") || "0")
-  const address = searchParams.get("address") || ""
+  const urlAddress = searchParams.get("address") || ""
   const orderId = searchParams.get("orderId") || `ORD-${Date.now()}`
+
+  // Initialize address from URL if available
+  useEffect(() => {
+    if (urlAddress) {
+      setDeliveryAddress(urlAddress)
+    }
+  }, [urlAddress])
 
   const subtotal = urlSubtotal || cartSubtotal
   const total = urlTotal || cartTotal
@@ -44,11 +53,11 @@ export default function PaymentFormPage() {
 
   const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!mobileNumber) {
+
+    if (!deliveryAddress) {
       toast({
-        title: "Numéro manquant",
-        description: "Veuillez saisir votre numéro de téléphone.",
+        title: "Adresse manquante",
+        description: "Veuillez saisir votre adresse de livraison.",
         variant: "destructive",
       })
       return
@@ -58,25 +67,33 @@ export default function PaymentFormPage() {
 
     try {
       const invoiceData = {
-        payer_msisdn: mobileNumber,
+        payer_msisdn: "0700000000", // Numéro par défaut ou à récupérer d'ailleurs
         amount: total,
-        short_description: "Paiement service X",
+        short_description: "Paiement Pizza Casa",
         payer_email: "", // Provide a valid email if available
-        description: "Paiement pour le service premium de mars 2025",
-        external_reference: "TXN-INV-0001",
-      };
-  
-      const invoice = await createInvoiceOnServer(invoiceData);
-  
-      const { url } = await getGatewayUrl(invoice.e_bill.bill_id);
-      window.location.href = url;
+        description: `Livraison à: ${deliveryAddress}`,
+        external_reference: orderId,
+      }
+
+      const invoice = await createInvoiceOnServer(invoiceData)
+
+      const { url } = await getGatewayUrl(invoice.e_bill.bill_id)
+
+      // Stocker l'adresse pour la récupérer après le paiement
+      sessionStorage.setItem("deliveryAddress", deliveryAddress)
+
+      window.location.href = url
     } catch (err) {
-      console.error("Erreur lors du paiement :", err);
+      console.error("Erreur lors du paiement :", err)
+      toast({
+        title: "Erreur de paiement",
+        description: "Une erreur est survenue lors du traitement du paiement. Veuillez réessayer.",
+        variant: "destructive",
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
-  
+  }
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("fr-FR").format(price) + " FCFA"
@@ -95,30 +112,25 @@ export default function PaymentFormPage() {
         {/* Formulaire de paiement */}
         <Card>
           <CardHeader>
-            <CardTitle>Finalisez votre paiement !</CardTitle>
-            <CardDescription>Entrez votre numéro pour recevoir la demande de paiement</CardDescription>
+            <CardTitle>Finalisez votre commande !</CardTitle>
+            <CardDescription>Entrez votre adresse de livraison pour finaliser la commande</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handlePaymentSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="mobileNumber">Numéro de téléphone *</Label>
-                <Input
-                  id="mobileNumber"
-                  placeholder="07X XXX XXX"
-                  value={mobileNumber}
-                  onChange={(e) => setMobileNumber(e.target.value)}
+                <Label htmlFor="deliveryAddress">Adresse de livraison *</Label>
+                <Textarea
+                  id="deliveryAddress"
+                  placeholder="Rue, quartier, ville..."
+                  value={deliveryAddress}
+                  onChange={(e) => setDeliveryAddress(e.target.value)}
                   required
+                  className="min-h-[100px]"
                 />
-                <p className="text-sm text-muted-foreground">
-                  Vous recevrez une demande de paiement sur ce numéro
-                </p>
+                <p className="text-sm text-muted-foreground">Veuillez indiquer une adresse précise pour la livraison</p>
               </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-[#ac1f1f] hover:bg-[#8e1a1a]"
-                disabled={isLoading}
-              >
+              <Button type="submit" className="w-full bg-[#ac1f1f] hover:bg-[#8e1a1a]" disabled={isLoading}>
                 {isLoading ? (
                   <span className="flex items-center justify-center">
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -150,10 +162,12 @@ export default function PaymentFormPage() {
               </div>
             </div>
 
-            <div className="bg-gray-50 p-3 rounded-md mt-4">
-              <h3 className="text-sm font-medium mb-1">Adresse de livraison</h3>
-              <p className="text-sm">{address || "Non spécifiée"}</p>
-            </div>
+            {deliveryAddress && (
+              <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-md mt-4">
+                <h3 className="text-sm font-medium mb-1">Adresse de livraison</h3>
+                <p className="text-sm">{deliveryAddress}</p>
+              </div>
+            )}
 
             <div className="pt-2">
               <p className="text-xs text-muted-foreground">

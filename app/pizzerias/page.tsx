@@ -9,13 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { Pizzeria } from "@/types/pizza";
 import { getNearbyPizzerias } from "@/data/pizzerias";
 import { MapPin, Search } from "lucide-react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import L from "leaflet";
+import dynamic from "next/dynamic";
 
-// Import Leaflet CSS
-import "leaflet/dist/leaflet.css";
-
-
+// Importer le composant de carte dynamiquement
+const MapComponent = dynamic(() => import('./MapComponent'), { ssr: false });
 
 export default function PizzeriasPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,14 +20,6 @@ export default function PizzeriasPage() {
   const [filteredPizzerias, setFilteredPizzerias] = useState<Pizzeria[]>([]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
-
-  // Icône personnalisée pour le marqueur
-  const customIcon = new L.Icon({
-    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-  });
 
   // Obtenir la position de l'utilisateur
   const getUserLocation = () => {
@@ -61,7 +50,6 @@ export default function PizzeriasPage() {
   useEffect(() => {
     let results = getNearbyPizzerias(userLocation?.lat || 0, userLocation?.lng || 0);
 
-    // Appliquer le filtre de recherche
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       results = results.filter(
@@ -70,7 +58,6 @@ export default function PizzeriasPage() {
       );
     }
 
-    // Appliquer le tri
     results.sort((a, b) => {
       switch (sortBy) {
         case "distance":
@@ -78,7 +65,6 @@ export default function PizzeriasPage() {
         case "rating":
           return b.rating - a.rating;
         case "deliveryTime":
-          // Convertir la plage de temps de livraison en minutes moyennes pour le tri
           const getAvgTime = (time: string) => {
             const [min, max] = time.split("-").map((t) => Number.parseInt(t));
             return (min + max) / 2;
@@ -111,28 +97,12 @@ export default function PizzeriasPage() {
           </Button>
         </div>
 
-{/* Carte Leaflet */}
-{userLocation && (
-  <div className="flex justify-center items-center mb-8">
-    <MapContainer
-      center={[userLocation.lat, userLocation.lng]}
-      zoom={13}
-      maxZoom={18}
-      zoomControl={true}
-      style={{ height: "400px", width: "80%" }}
-    >
-      {/* Couches de base */}
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      />
-      {/* Marqueur pour la position de l'utilisateur */}
-      <Marker position={[userLocation.lat, userLocation.lng]} icon={customIcon}>
-        <Popup>Vous êtes ici</Popup>
-      </Marker>
-    </MapContainer>
-  </div>
-)}
+        {/* Carte Leaflet */}
+        {userLocation && (
+          <div className="flex justify-center items-center mb-8">
+            <MapComponent userLocation={userLocation} />
+          </div>
+        )}
 
         {/* Recherche et tri */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
