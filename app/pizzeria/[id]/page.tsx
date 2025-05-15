@@ -1,54 +1,63 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Image from "next/image"
-import { useParams } from "next/navigation"
-import { MainNav } from "@/components/layout/main-nav"
-import { PizzaCard } from "@/components/pizza/pizza-card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { useToast } from "@/components/ui/use-toast"
-import { useCart } from "@/context/cart-context"
-import { getPizzeriaById } from "@/data/pizzerias"
-import { getPizzasByPizzeriaId } from "@/data/pizzas"
-import type { Pizza, Pizzeria } from "@/types/pizza"
-import { Clock, MapPin, Star } from "lucide-react"
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import { useParams } from "next/navigation";
+import { MainNav } from "@/components/layout/main-nav";
+import { PizzaCard } from "@/components/pizza/pizza-card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/use-toast";
+import { useCart } from "@/context/cart-context";
+import { getPizzeriaById } from "@/data/pizzerias";
+import { getPizzasByPizzeriaId } from "@/data/pizzas";
+import type { Pizza, Pizzeria } from "@/types/pizza";
+import { Clock, MapPin, Star } from "lucide-react";
 
 export default function PizzeriaPage() {
-  const params = useParams()
-  const { toast } = useToast()
-  const { addItem } = useCart()
-  const [pizzeria, setPizzeria] = useState<Pizzeria | null>(null)
-  const [pizzas, setPizzas] = useState<Pizza[]>([])
-  const [categories, setCategories] = useState<string[]>([])
-  const [activeCategory, setActiveCategory] = useState<string>("all")
+  const params = useParams();
+  const { toast } = useToast();
+  const { addItem } = useCart();
+  const [pizzeria, setPizzeria] = useState<Pizzeria | null>(null);
+  const [pizzas, setPizzas] = useState<Pizza[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>("all");
 
   useEffect(() => {
     if (params.id) {
-      const id = Array.isArray(params.id) ? params.id[0] : params.id
-      const foundPizzeria = getPizzeriaById(id)
-      const pizzeriasPizzas = getPizzasByPizzeriaId(id)
+      const id = Array.isArray(params.id) ? params.id[0] : params.id;
+      const foundPizzeria = getPizzeriaById(id);
+      const pizzeriasPizzas = getPizzasByPizzeriaId(id);
 
       if (foundPizzeria) {
-        setPizzeria(foundPizzeria)
+        setPizzeria(foundPizzeria);
+      } else {
+        console.error("Pizzeria non trouvée pour l'ID :", id);
       }
 
       if (pizzeriasPizzas) {
-        setPizzas(pizzeriasPizzas)
+        setPizzas(pizzeriasPizzas);
 
-        // Extract unique categories
-        const uniqueCategories = Array.from(new Set(pizzeriasPizzas.map((pizza) => pizza.category)))
-        setCategories(uniqueCategories)
+        // Extraire les catégories uniques
+        const uniqueCategories = Array.from(new Set(pizzeriasPizzas.map((pizza) => pizza.category)));
+        setCategories(uniqueCategories);
+      } else {
+        console.error("Aucune pizza trouvée pour l'ID de pizzeria :", id);
       }
     }
-  }, [params.id])
+  }, [params.id]);
 
   const handleAddToCart = (pizza: Pizza) => {
-    addItem(pizza, 1)
-  }
+    addItem(pizza, 1);
+    toast({
+      title: "Pizza ajoutée au panier",
+      description: `${pizza.name} a été ajoutée avec succès.`,
+      variant: "default",
+    });
+  };
 
-  // Filter pizzas by category
-  const filteredPizzas = activeCategory === "all" ? pizzas : pizzas.filter((pizza) => pizza.category === activeCategory)
+  // Filtrer les pizzas par catégorie
+  const filteredPizzas = activeCategory === "all" ? pizzas : pizzas.filter((pizza) => pizza.category === activeCategory);
 
   if (!pizzeria) {
     return (
@@ -59,7 +68,7 @@ export default function PizzeriaPage() {
           <p className="text-muted-foreground">La pizzeria que vous recherchez n'existe pas ou a été supprimée.</p>
         </main>
       </div>
-    )
+    );
   }
 
   return (
@@ -67,7 +76,7 @@ export default function PizzeriaPage() {
       <MainNav />
 
       <main className="flex-1">
-        {/* Pizzeria Header */}
+        {/* En-tête de la pizzeria */}
         <div className="relative h-64 w-full">
           <Image src={pizzeria.coverImage || "/placeholder.svg"} alt={pizzeria.name} fill className="object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
@@ -88,17 +97,13 @@ export default function PizzeriaPage() {
                   {pizzeria.isOpen ? (
                     <Badge className="bg-accent">Ouvert</Badge>
                   ) : (
-                    <Badge variant="outline" className="bg-background/80">
-                      Fermé
-                    </Badge>
+                    <Badge variant="outline" className="bg-background/80">Fermé</Badge>
                   )}
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-1">
                     <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
-                    <span>
-                      {pizzeria.rating} ({pizzeria.reviewCount} avis)
-                    </span>
+                    <span>{pizzeria.rating} ({pizzeria.reviewCount} avis)</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
@@ -114,14 +119,12 @@ export default function PizzeriaPage() {
           </div>
         </div>
 
-        {/* Pizzeria Info */}
+        {/* Informations sur la pizzeria */}
         <div className="container py-6 border-b">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
               <h3 className="font-semibold mb-1">Heures d'ouverture</h3>
-              <p className="text-muted-foreground">
-                {pizzeria.openingHours.open} - {pizzeria.openingHours.close}
-              </p>
+              <p className="text-muted-foreground">{pizzeria.openingHours.open} - {pizzeria.openingHours.close}</p>
             </div>
             <div>
               <h3 className="font-semibold mb-1">Frais de livraison</h3>
@@ -142,9 +145,7 @@ export default function PizzeriaPage() {
             <TabsList className="mb-6 flex flex-wrap">
               <TabsTrigger value="all">Tous</TabsTrigger>
               {categories.map((category) => (
-                <TabsTrigger key={category} value={category}>
-                  {category}
-                </TabsTrigger>
+                <TabsTrigger key={category} value={category}>{category}</TabsTrigger>
               ))}
             </TabsList>
 
@@ -166,5 +167,5 @@ export default function PizzeriaPage() {
         </div>
       </main>
     </div>
-  )
+  );
 }

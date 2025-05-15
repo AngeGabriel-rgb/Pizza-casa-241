@@ -1,172 +1,149 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import type { Pizza } from "@/types/pizza"
-import { useToast } from "@/components/ui/use-toast"
+import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
+import type { Pizza } from "@/types/pizza";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CartItem {
-  pizza: Pizza
-  quantity: number
-  specialInstructions?: string
+  pizza: Pizza;
+  quantity: number;
+  specialInstructions?: string;
 }
 
 interface CartContextType {
-  items: CartItem[]
-  pizzeriaId: string | null
-  addItem: (pizza: Pizza, quantity: number, specialInstructions?: string) => void
-  removeItem: (pizzaId: string) => void
-  updateQuantity: (pizzaId: string, quantity: number) => void
-  clearCart: () => void
-  setPizzeriaId: (id: string) => void
-  totalItems: number
-  subtotal: number
-  total: number
-  saveCartToStorage: () => void
+  items: CartItem[];
+  pizzeriaId: string | null;
+  addItem: (pizza: Pizza, quantity: number, specialInstructions?: string) => void;
+  removeItem: (pizzaId: string) => void;
+  updateQuantity: (pizzaId: string, quantity: number) => void;
+  clearCart: () => void;
+  setPizzeriaId: (id: string) => void;
+  totalItems: number;
+  subtotal: number;
+  total: number;
 }
 
-const CartContext = createContext<CartContextType | undefined>(undefined)
+const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const useCart = () => {
-  const context = useContext(CartContext)
+  const context = useContext(CartContext);
   if (context === undefined) {
-    throw new Error("useCart must be used within a CartProvider")
+    throw new Error("useCart must be used within a CartProvider");
   }
-  return context
-}
+  return context;
+};
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>([])
-  const [pizzeriaId, setPizzeriaId] = useState<string | null>(null)
-  const { toast } = useToast()
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [pizzeriaId, setPizzeriaId] = useState<string | null>(null);
+  const { toast } = useToast();
 
   // Charger le panier depuis le localStorage au démarrage
   useEffect(() => {
-    // Vérifier si nous sommes dans un environnement navigateur
     if (typeof window !== "undefined") {
-      try {
-        const savedCart = localStorage.getItem("pizza-casa-cart")
-        const savedPizzeriaId = localStorage.getItem("pizza-casa-pizzeria")
+      const savedCart = localStorage.getItem("pizza-casa-cart");
+      const savedPizzeriaId = localStorage.getItem("pizza-casa-pizzeria");
 
-        if (savedCart) {
-          setItems(JSON.parse(savedCart))
-        }
+      if (savedCart) {
+        setItems(JSON.parse(savedCart));
+      }
 
-        if (savedPizzeriaId) {
-          setPizzeriaId(savedPizzeriaId)
-        }
-      } catch (error) {
-        console.error("Erreur lors du chargement du panier:", error)
+      if (savedPizzeriaId) {
+        setPizzeriaId(savedPizzeriaId);
       }
     }
-  }, [])
+  }, []);
 
   // Sauvegarder le panier dans le localStorage à chaque modification
-  const saveCartToStorage = () => {
+  useEffect(() => {
     if (typeof window !== "undefined") {
-      try {
-        localStorage.setItem("pizza-casa-cart", JSON.stringify(items))
-
-        if (pizzeriaId) {
-          localStorage.setItem("pizza-casa-pizzeria", pizzeriaId)
-        } else {
-          localStorage.removeItem("pizza-casa-pizzeria")
-        }
-      } catch (error) {
-        console.error("Erreur lors de la sauvegarde du panier:", error)
+      localStorage.setItem("pizza-casa-cart", JSON.stringify(items));
+      if (pizzeriaId) {
+        localStorage.setItem("pizza-casa-pizzeria", pizzeriaId);
+      } else {
+        localStorage.removeItem("pizza-casa-pizzeria");
       }
     }
-  }
-
-  // Sauvegarder le panier à chaque modification des items
-  useEffect(() => {
-    saveCartToStorage()
-  }, [items, pizzeriaId])
+  }, [items, pizzeriaId]);
 
   const addItem = (pizza: Pizza, quantity: number, specialInstructions?: string) => {
     if (pizzeriaId && pizza.pizzeriaId !== pizzeriaId && items.length > 0) {
       toast({
         title: "Attention",
-        description:
-          "Vous ne pouvez commander que d'une seule pizzeria à la fois. Voulez-vous vider votre panier et commencer une nouvelle commande?",
+        description: "Vous ne pouvez commander que d'une seule pizzeria à la fois. Voulez-vous vider votre panier et commencer une nouvelle commande?",
         variant: "destructive",
         action: (
           <button
             className="bg-white text-red-500 px-3 py-1 rounded-md text-xs font-medium"
             onClick={() => {
-              clearCart()
-              setPizzeriaId(pizza.pizzeriaId)
-              setItems([{ pizza, quantity, specialInstructions }])
+              clearCart();
+              setPizzeriaId(pizza.pizzeriaId);
+              setItems([{ pizza, quantity, specialInstructions }]);
               toast({
                 title: "Panier mis à jour",
                 description: "Votre panier a été vidé et la nouvelle pizza a été ajoutée.",
-              })
+              });
             }}
           >
             Confirmer
           </button>
         ),
-      })
-      return
+      });
+      return;
     }
 
     if (!pizzeriaId) {
-      setPizzeriaId(pizza.pizzeriaId)
+      setPizzeriaId(pizza.pizzeriaId);
     }
 
     setItems((prevItems) => {
-      const existingItemIndex = prevItems.findIndex((item) => item.pizza.id === pizza.id)
-
+      const existingItemIndex = prevItems.findIndex((item) => item.pizza.id === pizza.id);
       if (existingItemIndex >= 0) {
-        const updatedItems = [...prevItems]
+        const updatedItems = [...prevItems];
         updatedItems[existingItemIndex] = {
           ...updatedItems[existingItemIndex],
           quantity: updatedItems[existingItemIndex].quantity + quantity,
           specialInstructions: specialInstructions || updatedItems[existingItemIndex].specialInstructions,
-        }
-        return updatedItems
+        };
+        return updatedItems;
       } else {
-        return [...prevItems, { pizza, quantity, specialInstructions }]
+        return [...prevItems, { pizza, quantity, specialInstructions }];
       }
-    })
+    });
 
     toast({
       title: "Ajouté au panier",
       description: `${pizza.name} a été ajouté à votre panier.`,
-    })
-  }
+    });
+  };
 
   const removeItem = (pizzaId: string) => {
-    setItems((prevItems) => prevItems.filter((item) => item.pizza.id !== pizzaId))
-
+    setItems((prevItems) => prevItems.filter((item) => item.pizza.id !== pizzaId));
     if (items.length === 1 && items[0].pizza.id === pizzaId) {
-      setPizzeriaId(null)
+      setPizzeriaId(null);
     }
-
     toast({
       title: "Retiré du panier",
       description: "L'article a été retiré de votre panier.",
-    })
-  }
+    });
+  };
 
   const updateQuantity = (pizzaId: string, quantity: number) => {
     if (quantity <= 0) {
-      removeItem(pizzaId)
-      return
+      removeItem(pizzaId);
+      return;
     }
-
-    setItems((prevItems) => prevItems.map((item) => (item.pizza.id === pizzaId ? { ...item, quantity } : item)))
-  }
+    setItems((prevItems) => prevItems.map((item) => (item.pizza.id === pizzaId ? { ...item, quantity } : item)));
+  };
 
   const clearCart = () => {
-    setItems([])
-    setPizzeriaId(null)
-  }
+    setItems([]);
+    setPizzeriaId(null);
+  };
 
-  // Calculer les totaux
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
-  const subtotal = items.reduce((sum, item) => sum + item.pizza.price * item.quantity, 0)
-  //const deliveryFee = subtotal > 0 ? 1500 : 0; // Supprimer cette ligne
-  const total = subtotal // Modifier cette ligne
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const subtotal = items.reduce((sum, item) => sum + item.pizza.price * item.quantity, 0);
+  const total = subtotal; // Modifier ici si nécessaire
 
   return (
     <CartContext.Provider
@@ -181,10 +158,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         totalItems,
         subtotal,
         total,
-        saveCartToStorage,
       }}
     >
       {children}
     </CartContext.Provider>
-  )
-}
+  );
+};

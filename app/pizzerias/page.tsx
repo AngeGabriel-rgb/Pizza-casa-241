@@ -1,4 +1,5 @@
 "use client";
+<<<<<<< HEAD
 
 import { useState, useEffect } from "react";
 import { MainNav } from "@/components/layout/main-nav";
@@ -16,6 +17,22 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 
+=======
+
+import { useState, useEffect } from "react";
+import { MainNav } from "@/components/layout/main-nav";
+import { PizzeriaCard } from "@/components/pizzeria/pizzeria-card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { Pizzeria } from "@/types/pizza";
+import { getNearbyPizzerias } from "@/data/pizzerias";
+import { MapPin, Search } from "lucide-react";
+import dynamic from "next/dynamic";
+
+// Importer le composant de carte dynamiquement
+const MapComponent = dynamic(() => import('./MapComponent'), { ssr: false });
+>>>>>>> ange
 
 export default function PizzeriasPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,6 +41,7 @@ export default function PizzeriasPage() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
 
+<<<<<<< HEAD
   // Icône personnalisée pour le marqueur
   const customIcon = new L.Icon({
     iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
@@ -32,6 +50,8 @@ export default function PizzeriasPage() {
     popupAnchor: [1, -34],
   });
 
+=======
+>>>>>>> ange
   // Obtenir la position de l'utilisateur
   const getUserLocation = () => {
     setIsLocating(true);
@@ -61,7 +81,10 @@ export default function PizzeriasPage() {
   useEffect(() => {
     let results = getNearbyPizzerias(userLocation?.lat || 0, userLocation?.lng || 0);
 
+<<<<<<< HEAD
     // Appliquer le filtre de recherche
+=======
+>>>>>>> ange
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       results = results.filter(
@@ -70,7 +93,10 @@ export default function PizzeriasPage() {
       );
     }
 
+<<<<<<< HEAD
     // Appliquer le tri
+=======
+>>>>>>> ange
     results.sort((a, b) => {
       switch (sortBy) {
         case "distance":
@@ -78,7 +104,10 @@ export default function PizzeriasPage() {
         case "rating":
           return b.rating - a.rating;
         case "deliveryTime":
+<<<<<<< HEAD
           // Convertir la plage de temps de livraison en minutes moyennes pour le tri
+=======
+>>>>>>> ange
           const getAvgTime = (time: string) => {
             const [min, max] = time.split("-").map((t) => Number.parseInt(t));
             return (min + max) / 2;
@@ -111,6 +140,7 @@ export default function PizzeriasPage() {
           </Button>
         </div>
 
+<<<<<<< HEAD
 {/* Carte Leaflet */}
 {userLocation && (
   <div className="flex justify-center items-center mb-8">
@@ -133,6 +163,14 @@ export default function PizzeriasPage() {
     </MapContainer>
   </div>
 )}
+=======
+        {/* Carte Leaflet */}
+        {userLocation && (
+          <div className="flex justify-center items-center mb-8">
+            <MapComponent userLocation={userLocation} />
+          </div>
+        )}
+>>>>>>> ange
 
         {/* Recherche et tri */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">

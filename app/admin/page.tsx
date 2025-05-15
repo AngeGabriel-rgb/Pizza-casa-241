@@ -1,363 +1,264 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { redirect } from "next/navigation"
+import { createClient } from "@/utils/supabase/server"
 import { Button } from "@/components/ui/button"
-import { ArrowUpRight, Users, Store, ShoppingBag, TrendingUp } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { ArrowRight, Pizza, ShoppingBag, Users, Star } from "lucide-react"
+import Link from "next/link"
 
-// Composant pour les graphiques
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-  ChartGrid,
-  ChartLine,
-  ChartArea,
-  ChartAxisOptions,
-  ChartXAxis,
-  ChartYAxis,
-  ChartBar,
-} from "@/components/ui/chart"
+export default async function Home() {
+  const supabase = createClient()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
 
-export default function AdminDashboard() {
-  // Données pour les graphiques
-  const salesData = [
-    { date: "Jan", revenue: 4500 },
-    { date: "Fév", revenue: 5200 },
-    { date: "Mar", revenue: 4800 },
-    { date: "Avr", revenue: 5800 },
-    { date: "Mai", revenue: 6000 },
-    { date: "Juin", revenue: 7200 },
-    { date: "Juil", revenue: 8500 },
-  ]
-
-  const pizzeriasData = [
-    { name: "Napoli Authentic", orders: 245, revenue: 4850 },
-    { name: "Pizza Bella", orders: 187, revenue: 3740 },
-    { name: "Roma Pizza", orders: 156, revenue: 3120 },
-    { name: "Mamma Mia", orders: 132, revenue: 2640 },
-    { name: "Pizz'Art", orders: 98, revenue: 1960 },
-  ]
-
-  const recentOrders = [
-    {
-      id: "CMD-123456",
-      customer: "Jean ",
-      avatar: "/placeholder.svg?height=32&width=32",
-      pizzeria: "Napoli Authentic",
-      total: 32.8,
-      status: "delivered",
-      date: "Il y a 2 heures",
-    },
-    {
-      id: "CMD-123457",
-      customer: "Marie ",
-      avatar: "/placeholder.svg?height=32&width=32",
-      pizzeria: "Pizza Bella",
-      total: 25.9,
-      status: "preparing",
-      date: "Il y a 3 heures",
-    },
-    {
-      id: "CMD-123458",
-      customer: "Leroy",
-      avatar: "/placeholder.svg?height=32&width=32",
-      pizzeria: "Roma Pizza",
-      total: 28.7,
-      status: "confirmed",
-      date: "Il y a 4 heures",
-    },
-    {
-      id: "CMD-123459",
-      customer: " Bernard",
-      avatar: "/placeholder.svg?height=32&width=32",
-      pizzeria: "Mamma Mia",
-      total: 19.5,
-      status: "delivering",
-      date: "Il y a 2 heures",
-    },
-    {
-      id: "CMD-123460",
-      customer: "Lucas ",
-      avatar: "/placeholder.svg?height=32&width=32",
-      pizzeria: "Pizz'Art",
-      total: 42.3,
-      status: "confirmed",
-      date: "Il y a 5 heures",
-    },
-  ]
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return "bg-blue-100 text-blue-800"
-      case "preparing":
-        return "bg-yellow-100 text-yellow-800"
-      case "delivering":
-        return "bg-purple-100 text-purple-800"
-      case "delivered":
-        return "bg-green-100 text-green-800"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
-  }
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "confirmed":
-        return "Confirmée"
-      case "preparing":
-        return "En préparation"
-      case "delivering":
-        return "En livraison"
-      case "delivered":
-        return "Livrée"
-      default:
-        return status
-    }
+  // Si l'utilisateur est déjà connecté, rediriger vers le tableau de bord
+  if (session) {
+    redirect("/dashboard")
   }
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8">
-      <div className="flex items-center justify-between">
-        <h2 className="text-3xl font-bold tracking-tight font-montserrat">Tableau de bord</h2>
-        <div className="flex items-center gap-2">
-          <Button variant="outline">Télécharger</Button>
-          <Button className="bg-[#FFB000] hover:bg-[#FF914D]">
-            <TrendingUp className="mr-2 h-4 w-4" />
-            Rapports
-          </Button>
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      <header className="bg-gradient-to-r from-[#9B1B1B] to-[#FF914D] text-white">
+        <div className="container mx-auto px-4 py-6">
+          <nav className="flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <Pizza className="h-8 w-8" />
+              <span className="text-2xl font-bold">Admin PizzaCasa</span>
+            </div>
+            <div className="hidden md:flex space-x-6">
+              <a href="#features" className="hover:text-[#FFB000] transition-colors">
+                Fonctionnalités
+              </a>
+              <a href="#testimonials" className="hover:text-[#FFB000] transition-colors">
+                Témoignages
+              </a>
+              <a href="#pricing" className="hover:text-[#FFB000] transition-colors">
+                Tarifs
+              </a>
+            </div>
+            <div className="flex space-x-2">
+              <Button className="bg-white text-[#9B1B1B] hover:bg-[#FFB000] hover:text-white">
+                <Link href="/login">Connexion</Link>
+              </Button>
+              <Button className="bg-[#FFB000] text-white hover:bg-white hover:text-[#9B1B1B]">
+                <Link href="/register">Inscription</Link>
+              </Button>
+            </div>
+          </nav>
         </div>
-      </div>
+      </header>
 
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="analytics">Analytiques</TabsTrigger>
-          <TabsTrigger value="reports">Rapports</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-4">
-          {/* Statistiques */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Chiffre d'affaires</CardTitle>
-                <ArrowUpRight className="h-4 w-4 text-green-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0fcfa</div>
-                <p className="text-xs text-muted-foreground">
-                  <span className="text-green-500">0%</span> par rapport au mois dernier
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Commandes</CardTitle>
-                <ShoppingBag className="h-4 w-4 text-[#FFB000]" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">
-                  <span className="text-green-500">0%</span> par rapport au mois dernier
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Utilisateurs</CardTitle>
-                <Users className="h-4 w-4 text-[#9B1B1B]" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">
-                  <span className="text-green-500">0%</span> par rapport au mois dernier
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pizzerias</CardTitle>
-                <Store className="h-4 w-4 text-[#FF914D]" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0</div>
-                <p className="text-xs text-muted-foreground">
-                  <span className="text-green-500">0</span> nouvelles ce mois-ci
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Graphiques */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Chiffre d'affaires</CardTitle>
-                <CardDescription>Évolution du chiffre d'affaires sur les 7 derniers mois</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80">
-                  <ChartContainer
-                    data={salesData}
-                    xAxis={
-                      <ChartAxisOptions
-                        dataKey="date"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={10}
-                        tickFormatter={(value) => value}
-                      />
-                    }
-                    yAxis={
-                      <ChartAxisOptions
-                        dataKey="revenue"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={10}
-                        tickFormatter={(value) => `${value}€`}
-                      />
-                    }
-                  >
-                    <ChartGrid vertical={false} />
-                    <ChartArea dataKey="revenue" fill="url(#colorRevenue)" stroke="#FFB000" />
-                    <ChartLine dataKey="revenue" stroke="#FFB000" strokeWidth={2} />
-                    <ChartXAxis dataKey="date" />
-                    <ChartYAxis />
-                    <ChartTooltip
-                      content={<ChartTooltipContent formatter={(value) => [`${value}€`, "Chiffre d'affaires"]} />}
-                    />
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#FFB000" stopOpacity={0.8} />
-                        <stop offset="95%" stopColor="#FFB000" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                  </ChartContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance des pizzerias</CardTitle>
-                <CardDescription>Nombre de commandes par pizzeria ce mois-ci</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-80">
-                  <ChartContainer
-                    data={pizzeriasData}
-                    xAxis={
-                      <ChartAxisOptions
-                        dataKey="name"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={10}
-                        tickFormatter={(value) => value}
-                      />
-                    }
-                    yAxis={
-                      <ChartAxisOptions
-                        dataKey="orders"
-                        tickLine={false}
-                        axisLine={false}
-                        tickMargin={10}
-                        tickFormatter={(value) => `${value} commandes`}
-                      />
-                    }
-                  >
-                    <ChartGrid vertical={false} />
-                    <ChartBar dataKey="orders" fill="#9B1B1B" radius={[4, 4, 0, 0]} />
-                    <ChartXAxis dataKey="name" />
-                    <ChartYAxis />
-                    <ChartTooltip
-                      content={
-                        <ChartTooltipContent
-                          formatter={(value, name, props) => [value, "Commandes", `Revenu: ${props.payload.revenue}€`]}
-                        />
-                      }
-                    />
-                  </ChartContainer>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Commandes récentes */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Commandes récentes</CardTitle>
-              <CardDescription>Aperçu des 5 dernières commandes</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {recentOrders.map((order) => (
-                  <div
-                    key={order.id}
-                    className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
-                  >
-                    <div className="flex items-center gap-4">
-                      <Avatar>
-                        <AvatarImage src={order.avatar || "/placeholder.svg"} alt={order.customer} />
-                        <AvatarFallback>{order.customer.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-sm font-medium">{order.customer}</p>
-                        <p className="text-xs text-muted-foreground">{order.id}</p>
-                      </div>
-                    </div>
-                    <div className="text-sm text-muted-foreground">{order.pizzeria}</div>
-                    <div className="text-sm font-medium">{order.total.toFixed(2)} €</div>
-                    <Badge className={getStatusColor(order.status)}>{getStatusLabel(order.status)}</Badge>
-                    <div className="text-xs text-muted-foreground">{order.date}</div>
-                  </div>
-                ))}
+      <main className="flex-grow">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-r from-[#9B1B1B] to-[#FF914D] text-white py-20">
+          <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <div className="md:w-1/2 mb-10 md:mb-0">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                Gérez votre réseau de pizzerias en toute simplicité
+              </h1>
+              <p className="text-xl mb-8">
+                Une plateforme complète pour gérer vos commandes, vos pizzerias et vos clients en un seul endroit.
+              </p>
+              <div className="flex space-x-4">
+                <Button size="lg" className="bg-white text-[#9B1B1B] hover:bg-[#FFB000] hover:text-white">
+                  <Link href="/login" className="flex items-center">
+                    Commencer maintenant <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white text-white hover:bg-white hover:text-[#9B1B1B]"
+                >
+                  En savoir plus
+                </Button>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            </div>
+            <div className="md:w-1/2">
+              <img
+                src="/placeholder.svg?height=400&width=600"
+                alt="Dashboard Preview"
+                className="rounded-lg shadow-2xl"
+              />
+            </div>
+          </div>
+        </section>
 
-        <TabsContent value="analytics" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Analytiques</CardTitle>
-              <CardDescription>Données analytiques détaillées</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>Contenu des analytiques à venir...</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {/* Features Section */}
+        <section id="features" className="py-20 bg-white">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12">Fonctionnalités principales</h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              <div className="bg-gray-50 p-6 rounded-lg shadow-md">
+                <div className="bg-[#FFB000]/10 p-3 rounded-full w-fit mb-4">
+                  <ShoppingBag className="h-8 w-8 text-[#FFB000]" />
+                </div>
+                <h3 className="text-xl font-bold mb-3">Gestion des commandes</h3>
+                <p className="text-gray-600">
+                  Suivez toutes vos commandes en temps réel, de la confirmation à la livraison.
+                </p>
+              </div>
+              <div className="bg-gray-50 p-6 rounded-lg shadow-md">
+                <div className="bg-[#9B1B1B]/10 p-3 rounded-full w-fit mb-4">
+                  <Pizza className="h-8 w-8 text-[#9B1B1B]" />
+                </div>
+                <h3 className="text-xl font-bold mb-3">Gestion des pizzerias</h3>
+                <p className="text-gray-600">
+                  Gérez facilement votre réseau de pizzerias, leurs menus et leurs performances.
+                </p>
+              </div>
+              <div className="bg-gray-50 p-6 rounded-lg shadow-md">
+                <div className="bg-[#FF914D]/10 p-3 rounded-full w-fit mb-4">
+                  <Users className="h-8 w-8 text-[#FF914D]" />
+                </div>
+                <h3 className="text-xl font-bold mb-3">Gestion des utilisateurs</h3>
+                <p className="text-gray-600">Administrez les comptes utilisateurs, les rôles et les permissions.</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
-        <TabsContent value="reports" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Rapports</CardTitle>
-              <CardDescription>Rapports détaillés</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>Contenu des rapports à venir...</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
+        {/* Testimonials */}
+        <section id="testimonials" className="py-20 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center mb-12">Ce que nos clients disent</h2>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-center mb-4">
+                  <div className="flex text-[#FFB000]">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 fill-current" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  "Depuis que nous utilisons PizzaManager, notre efficacité a augmenté de 30%. La gestion des commandes
+                  est devenue un jeu d'enfant."
+                </p>
+                <div className="flex items-center">
+                  <img src="/placeholder.svg?height=50&width=50" alt="Client" className="h-12 w-12 rounded-full mr-4" />
+                  <div>
+                    <p className="font-bold">Jean </p>
+                    <p className="text-sm text-gray-500">Directeur, Pizzeria Napoli</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white p-6 rounded-lg shadow-md">
+                <div className="flex items-center mb-4">
+                  <div className="flex text-[#FFB000]">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 fill-current" />
+                    ))}
+                  </div>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  "Le tableau de bord est incroyablement intuitif. Je peux suivre les performances de toutes mes
+                  pizzerias en un coup d'œil."
+                </p>
+                <div className="flex items-center">
+                  <img src="/placeholder.svg?height=50&width=50" alt="Client" className="h-12 w-12 rounded-full mr-4" />
+                  <div>
+                    <p className="font-bold">Marie Martin</p>
+                    <p className="text-sm text-gray-500">Propriétaire, Réseau Pizza Bella</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-        <TabsContent value="notifications" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Notifications</CardTitle>
-              <CardDescription>Centre de notifications</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p>Contenu des notifications à venir...</p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        {/* CTA Section */}
+        <section className="py-20 bg-white">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="text-3xl font-bold mb-6">Prêt à optimiser la gestion de vos pizzerias?</h2>
+            <p className="text-xl mb-8 max-w-2xl mx-auto">
+              Rejoignez des centaines de propriétaires de pizzerias qui ont déjà transformé leur activité grâce à notre
+              plateforme.
+            </p>
+            <div className="flex justify-center space-x-4">
+              <Button size="lg" className="bg-[#9B1B1B] hover:bg-[#FF914D] text-white">
+                <Link href="/register">Créer un compte</Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-[#9B1B1B] text-[#9B1B1B] hover:bg-[#9B1B1B] hover:text-white"
+              >
+                <Link href="/login">Se connecter</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="bg-gray-800 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <Pizza className="h-6 w-6" />
+                <span className="text-xl font-bold">Admin PizzaCasa </span>
+              </div>
+              <p className="text-gray-400">La solution complète pour la gestion de votre réseau de pizzerias.</p>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-4">Liens rapides</h3>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white">
+                    Accueil
+                  </a>
+                </li>
+                <li>
+                  <a href="#features" className="text-gray-400 hover:text-white">
+                    Fonctionnalités
+                  </a>
+                </li>
+                <li>
+                  <a href="#testimonials" className="text-gray-400 hover:text-white">
+                    Témoignages
+                  </a>
+                </li>
+                <li>
+                  <a href="#pricing" className="text-gray-400 hover:text-white">
+                    Tarifs
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-4">Légal</h3>
+              <ul className="space-y-2">
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white">
+                    Conditions d'utilisation
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white">
+                    Politique de confidentialité
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="text-gray-400 hover:text-white">
+                    Mentions légales
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-bold mb-4">Contact</h3>
+              <ul className="space-y-2">
+                <li className="text-gray-400">contact@pizzamanager.com</li>
+                <li className="text-gray-400">+241 77 36 44 91</li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; {new Date().getFullYear()} PizzaManager. Tous droits réservés.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
