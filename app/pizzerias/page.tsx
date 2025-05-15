@@ -9,8 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import type { Pizzeria } from "@/types/pizza";
 import { getNearbyPizzerias } from "@/data/pizzerias";
 import { MapPin, Search } from "lucide-react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
 import L from "leaflet";
+import type { LatLngExpression, Icon } from "leaflet";
 
 // Import Leaflet CSS
 import "leaflet/dist/leaflet.css";
@@ -21,11 +22,12 @@ export default function PizzeriasPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("distance");
   const [filteredPizzerias, setFilteredPizzerias] = useState<Pizzeria[]>([]);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number; accuracy?: number } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   // Icône personnalisée pour le marqueur
-  const customIcon = new L.Icon({
+  const customIcon: Icon = new L.Icon({
     iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
     iconSize: [25, 41],
     iconAnchor: [12, 41],
@@ -35,24 +37,48 @@ export default function PizzeriasPage() {
   // Obtenir la position de l'utilisateur
   const getUserLocation = () => {
     setIsLocating(true);
+    setLocationError(null);
 
     if (navigator.geolocation) {
+      const options = {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      };
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setUserLocation({
             lat: position.coords.latitude,
             lng: position.coords.longitude,
+            accuracy: position.coords.accuracy
           });
           setIsLocating(false);
         },
         (error) => {
           console.error("Erreur de géolocalisation :", error);
-          alert("Impossible d'obtenir votre position.");
+          let errorMessage = "Impossible d'obtenir votre position.";
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = "Vous avez refusé l'accès à votre position.";
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = "Les informations de position ne sont pas disponibles.";
+              break;
+            case error.TIMEOUT:
+              errorMessage = "La demande de position a expiré.";
+              break;
+          }
+          setLocationError(errorMessage);
+          alert(errorMessage);
           setIsLocating(false);
-        }
+        },
+        options
       );
     } else {
-      alert("La géolocalisation n'est pas prise en charge par votre navigateur.");
+      const errorMessage = "La géolocalisation n'est pas prise en charge par votre navigateur.";
+      setLocationError(errorMessage);
+      alert(errorMessage);
       setIsLocating(false);
     }
   };
@@ -95,10 +121,10 @@ export default function PizzeriasPage() {
   }, [searchTerm, sortBy, userLocation]);
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen relative">
       <MainNav />
 
-      <main className="flex-1 container py-8">
+      <main className="flex-1 container py-8 relative">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold mb-2">Pizzerias</h1>
@@ -113,24 +139,37 @@ export default function PizzeriasPage() {
 
 {/* Carte Leaflet */}
 {userLocation && (
-  <div className="flex justify-center items-center mb-8">
+  <div className="relative w-full mb-8" style={{ zIndex: 0 }}>
     <MapContainer
-      center={[userLocation.lat, userLocation.lng]}
-      zoom={13}
+      center={[userLocation.lat, userLocation.lng] as LatLngExpression}
+      zoom={15}
       maxZoom={18}
       zoomControl={true}
-      style={{ height: "400px", width: "80%" }}
+      style={{ height: "400px", width: "80%", margin: "0 auto" }}
     >
-      {/* Couches de base */}
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {/* Marqueur pour la position de l'utilisateur */}
-      <Marker position={[userLocation.lat, userLocation.lng]} icon={customIcon}>
-        <Popup>Vous êtes ici</Popup>
+      <Marker 
+        position={[userLocation.lat, userLocation.lng] as LatLngExpression} 
+        icon={customIcon}
+      >
+        <Popup>Vous êtes ici{userLocation.accuracy ? ` (précision: ${Math.round(userLocation.accuracy)}m)` : ''}</Popup>
       </Marker>
+      {userLocation.accuracy && (
+        <Circle
+          center={[userLocation.lat, userLocation.lng] as LatLngExpression}
+          radius={userLocation.accuracy}
+          pathOptions={{ color: 'blue', fillColor: 'blue', fillOpacity: 0.1 }}
+        />
+      )}
     </MapContainer>
+    {locationError && (
+      <div className="text-red-500 text-center mt-2">
+        {locationError}
+      </div>
+    )}
   </div>
 )}
 
